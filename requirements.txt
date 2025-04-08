@@ -3,3 +3,4 @@ Pillow
 SpeechRecognition
 pyaudio
 mysql-connector-python
+python-dotenv
