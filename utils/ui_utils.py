@@ -25,6 +25,24 @@ def create_frame_s(
     return frame
 
 
+def create_button(master, texto, comando, relx, rely):
+    button = ctk.CTkButton(
+        master,
+        text=texto,
+        command=comando,
+        width=160,
+        height=42,
+        corner_radius=12,
+        fg_color="#2E2E2E",
+        border_width=2,
+        border_color="#EAEAEA",
+        text_color="#EAEAEA",
+        hover_color="#8C7853"
+    )
+    button.place(relx=relx, rely=rely, anchor="center")
+    return button
+
+
 
 
 
