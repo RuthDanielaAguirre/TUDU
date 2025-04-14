@@ -42,6 +42,48 @@ def create_button(master, texto, comando, relx, rely):
     button.place(relx=relx, rely=rely, anchor="center")
     return button
 
+def create_entry_with_label(master, label_text, relx, rely, is_password=False):
+    font_label = ("Helvetica", 14)
+    font_entry = ("Helvetica", 13)
+
+    normal_color = "#444444"
+    focus_color = "#8C7853"
+
+    label = ctk.CTkLabel(
+        master,
+        text=label_text,
+        font=font_label,
+        text_color="#EAEAEA",
+        fg_color="transparent"
+    )
+    label.place(relx=relx, rely=rely - 0.07, anchor="center")
+
+    # Entry = input
+    entry = ctk.CTkEntry(
+        master,
+        placeholder_text=label_text,
+        font=font_entry,
+        width=220,
+        height=40,
+        corner_radius=16,
+        text_color="#EAEAEA",
+        fg_color="#2E2E2E",
+        border_width=2,
+        border_color="#444444",
+        show="*" if is_password else ""
+    )
+    entry.place(relx=relx, rely=rely, anchor="center")
+
+    def on_focus_in(event):
+        entry.configure(border_color=focus_color)
+
+    def on_focus_out(event):
+        entry.configure(border_color=normal_color)
+
+    entry.bind("<FocusIn>", on_focus_in)
+    entry.bind("<FocusOut>", on_focus_out)
+
+    return entry
 
 
 
