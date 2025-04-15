@@ -9,7 +9,6 @@ def create_frame_s(
     fondo_base="#1F1F1F",
     color_frame="#2E2E2E"
 ):
-    # Background
     master.configure(fg_color=fondo_base)
 
     # Frame
@@ -18,7 +17,7 @@ def create_frame_s(
         corner_radius=20,
         fg_color=color_frame,
         border_width=2,
-        border_color="#444444"
+        border_color="#8C7853"
     )
     frame.place(relx=relx, rely=rely, relwidth=relwidth, relheight=relheight)
     frame.lift()
@@ -58,7 +57,6 @@ def create_entry_with_label(master, label_text, relx, rely, is_password=False):
     )
     label.place(relx=relx, rely=rely - 0.07, anchor="center")
 
-    # Entry = input
     entry = ctk.CTkEntry(
         master,
         placeholder_text=label_text,
@@ -84,6 +82,17 @@ def create_entry_with_label(master, label_text, relx, rely, is_password=False):
     entry.bind("<FocusOut>", on_focus_out)
 
     return entry
+
+def show_error_label(master, text):
+    error_label = ctk.CTkLabel(
+        master,
+        text=text,
+        font=("Helvetica", 14),
+        text_color="red",
+        fg_color="transparent"
+    )
+    error_label.place(relx=0.5, rely=0.7, anchor="center")
+    return error_label
 
 
 

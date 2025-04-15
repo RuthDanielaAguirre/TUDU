@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from PIL import Image
 from customtkinter import CTkImage
-from utils.ui_utils import create_frame_s, create_button, create_entry_with_label
+from utils.ui_utils import create_frame_s, create_button, create_entry_with_label, show_error_label
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
@@ -10,6 +10,8 @@ class LoginView(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.title("Login - TUDU")
+
+        self.error_label= None
 
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
@@ -44,7 +46,7 @@ class LoginView(ctk.CTk):
         self.username_entry = create_entry_with_label(self.login_frame, "Username", 0.5, 0.35)
         self.password_entry = create_entry_with_label(self.login_frame, "Password", 0.5, 0.55, is_password=True)
 
-        self.login_button = create_button(self.login_frame, "Submit", self.procesar_login, 0.5, 0.8)
+        self.login_button = create_button(self.login_frame, "Submit", self.process_login, 0.5, 0.8)
 
         self.bind("<Configure>", self.resize_image)
 
@@ -53,8 +55,18 @@ class LoginView(ctk.CTk):
         self.fondo.configure(image=nueva_imagen)
         self.fondo.image = nueva_imagen
 
-    def procesar_login(self):
-        print("✅ Login enviado")
+    def process_login(self):
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+
+        if self.error_label:
+            self.error_label.destroy()
+            self.error_label =  None
+
+        if username == "" or password == "":
+            self.error_label= show_error_label(self.login_frame,"Please enter valid information.")
+        else:
+            print("valid login")
 
 if __name__ == "__main__":
     app = LoginView()
