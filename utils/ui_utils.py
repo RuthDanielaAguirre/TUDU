@@ -94,6 +94,24 @@ def show_error_label(master, text):
     error_label.place(relx=0.5, rely=0.7, anchor="center")
     return error_label
 
+def create_back_button(master, texto, comando, relx, rely):
+    back_button = ctk.CTkButton(
+        master,
+        text=texto,
+        command=comando,
+        width=40,
+        height=40,
+        corner_radius=12,
+        fg_color="#2E2E2E",
+        border_width=2,
+        border_color="#EAEAEA",
+        text_color="#EAEAEA",
+        hover_color="#8C7853"
+    )
+    back_button.place(relx=relx, rely=rely, anchor="center")
+    return back_button
+
+
 
 
 
