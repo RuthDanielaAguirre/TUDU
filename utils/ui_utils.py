@@ -1,4 +1,6 @@
 import customtkinter as ctk
+from tkcalendar import DateEntry
+
 
 def create_frame_s(
     master,
@@ -11,7 +13,6 @@ def create_frame_s(
 ):
     master.configure(fg_color=fondo_base)
 
-    # Frame
     frame = ctk.CTkFrame(
         master,
         corner_radius=20,
@@ -83,7 +84,7 @@ def create_entry_with_label(master, label_text, relx, rely, is_password=False):
 
     return entry
 
-def show_error_label(master, text):
+def show_error_label(master, text, relx=0.5, rely=0.7):
     error_label = ctk.CTkLabel(
         master,
         text=text,
@@ -91,7 +92,7 @@ def show_error_label(master, text):
         text_color="red",
         fg_color="transparent"
     )
-    error_label.place(relx=0.5, rely=0.7, anchor="center")
+    error_label.place(relx=relx, rely=rely, anchor="center")
     return error_label
 
 def create_back_button(master, texto, comando, relx, rely):
@@ -110,6 +111,47 @@ def create_back_button(master, texto, comando, relx, rely):
     )
     back_button.place(relx=relx, rely=rely, anchor="center")
     return back_button
+
+def create_datepicker_with_label(master, label_text, relx, rely):
+    font_label = ("Helvetica", 14)
+
+    label = ctk.CTkLabel(
+        master,
+        text=label_text,
+        font=font_label,
+        text_color="#EAEAEA",
+        fg_color="transparent"
+    )
+    label.place(relx=relx, rely=rely - 0.07, anchor="center")
+
+    font_entry = ("Helvetica", 13)
+    calendar = DateEntry(
+        master,
+        font=font_entry,
+        width=22,
+        background="#2E2E2E",
+        foreground="#EAEAEA",
+        borderwidth=2,
+        date_pattern="dd/MM/yyyy",
+        showweeknumbers=False,
+        state="readonly",
+
+        headersbackground="#2E2E2E",
+        headersforeground="#EAEAEA",
+        normalbackground="#2E2E2E",
+        normalforeground="#EAEAEA",
+        weekendbackground="#3A2F24",
+        weekendforeground="#F0EAD6",
+        othermonthforeground="#777777",
+        othermonthbackground="#1F1F1F",
+        selectbackground="#8C7853",
+        selectforeground="#EAEAEA",
+        disabledbackground="#2E2E2E",
+        disabledforeground="#888888"
+    )
+    calendar.place(relx=relx, rely=rely, anchor="center")
+
+    return calendar
 
 
 
