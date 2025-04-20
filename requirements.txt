@@ -1,6 +1,8 @@
 customtkinter
 Pillow
-SpeechRecognition
+speechrecognition
+langdetect
+pocketsphinx
 pyaudio
 mysql-connector-python
 python-dotenv
