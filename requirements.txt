@@ -1,9 +1,10 @@
-customtkinter
-Pillow
-speechrecognition
+customtkinter~=5.2.2
+Pillow~=11.1.0
+speechrecognition~=3.14.1
 langdetect
 pocketsphinx
 pyaudio
-mysql-connector-python
-python-dotenv
-tkcalendar
+mysql-connector-python~=9.2.0
+python-dotenv~=1.0.1
+tkcalendar~=1.6.1
+requests~=2.32.3
