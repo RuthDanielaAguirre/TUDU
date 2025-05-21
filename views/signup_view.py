@@ -104,4 +104,5 @@ class SignupFrame(ctk.CTkFrame):
 
             print("Empty information")
         else:
-            print("✅ Signup completed (fake success for now)")
+            print("Sign up completed (f.success)")
+            self.master.show_dashboard()

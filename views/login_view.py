@@ -52,7 +52,7 @@ class LoginFrame(ctk.CTkFrame):
             self.error_label = show_error_label(self.login_frame, "Please enter valid information.")
         else:
             print("✅ Login enviado")
-            self.back_to_home_callback()
+            self.master.show_dashboard()
 
     def volver_atras(self):
         self.master.show_home()

@@ -1,5 +1,7 @@
 import customtkinter as ctk
 from tkcalendar import DateEntry
+from PIL import Image
+from customtkinter import CTkImage, CTkButton
 
 
 def create_frame_s(
@@ -153,6 +155,34 @@ def create_datepicker_with_label(master, label_text, relx, rely):
 
     return calendar
 
+
+def create_toggle_icon_button(master, image_on_path, image_off_path, command_on, command_off, relx, rely):
+    state = {"on": False} 
+
+    image_on = CTkImage(Image.open(image_on_path), size=(32, 32))
+    image_off = CTkImage(Image.open(image_off_path), size=(32, 32))
+
+    def toggle():
+        state["on"] = not state["on"]
+        if state["on"]:
+            button.configure(image=image_on, fg_color="#8C7853")  # activo
+            command_on()
+        else:
+            button.configure(image=image_off, fg_color="#2E2E2E")  # inactivo
+            command_off()
+
+    button = CTkButton(
+        master,
+        text="",
+        image=image_off,
+        command=toggle,
+        width=40,
+        height=40,
+        fg_color="#2E2E2E",
+        corner_radius=8
+    )
+    button.place(relx=relx, rely=rely, anchor="center")
+    return button
 
 
 

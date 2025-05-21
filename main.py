@@ -2,6 +2,7 @@ import customtkinter as ctk
 from views.home_view import HomeFrame
 from views.login_view import LoginFrame
 from views.signup_view import SignupFrame
+from views.dashboard_view import DashboardFrame
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
@@ -35,6 +36,11 @@ class MainApp(ctk.CTk):
     def show_signup(self):
         self.clear_frame()
         self.current_frame = SignupFrame(self, self.show_home)
+        self.current_frame.pack(fill="both", expand=True)
+
+    def show_dashboard(self):
+        self.clear_frame()
+        self.clear_frame = DashboardFrame(self)
         self.current_frame.pack(fill="both", expand=True)
 
 if __name__ == "__main__":
