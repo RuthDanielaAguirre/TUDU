@@ -1,8 +1,22 @@
 import speech_recognition as sr
 
+is_speaker_on = True
+
+def toggle_speaker_on():
+    global is_speaker_on
+    is_speaker_on = True
+    print("🔊 Altavoz activado.")
+
+def toggle_speaker_off():
+    global is_speaker_on
+    is_speaker_on = False
+    print("🔇 Altavoz desactivado.")
+
+def speaker_status():
+    return is_speaker_on
+
 def listen_to_voice():
     recognizer = sr.Recognizer()
-
     try:
         with sr.Microphone() as source:
             print("🎤 Please speak now...")

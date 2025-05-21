@@ -2,10 +2,14 @@ from gtts import gTTS
 import pygame
 import time
 from io import BytesIO
+from utils.input_audio_utils import speaker_status
 
 pygame.mixer.init()
 
 def speak(text, lang="es"):
+    if not speaker_status():
+        print("🔇 Altavoz desactivado. No se reproducirá voz.")
+        return
     try:
         tts = gTTS(text, lang=lang)
         mp3_fp = BytesIO()

@@ -2,6 +2,9 @@ import os
 from dotenv import load_dotenv
 import requests
 
+from utils.input_audio_utils import listen_to_voice, save_audio_to_wav
+from utils.output_audio_utils import speak
+
 
 load_dotenv()
 
@@ -20,6 +23,15 @@ def send_audio(filename):
     except Exception as e:
         print("🚫 Error sending audio:", e)
         return{"error": str(e)}
+
+def handle_voice_interaction():
+    audio = listen_to_voice()
+    if audio:
+        filename = "user_voice.wav"
+        save_audio_to_wav(audio, filename)
+        response = send_audio(filename)
+        if response and "text" in response:
+            speak(response["text"])
 
 
 if __name__ == "__main__":
