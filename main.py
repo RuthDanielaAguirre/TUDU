@@ -20,8 +20,14 @@ class MainApp(ctk.CTk):
         self.show_home()
 
     def clear_frame(self):
-        if self.current_frame:
-            self.current_frame.destroy()
+     if self.current_frame:
+        try:
+            self.current_frame.pack_forget()
+            self.current_frame.place_forget()
+            self.current_frame.destroy()  
+        except Exception as e:
+            print("⚠️ Error destruyendo frame:", e)
+        self.current_frame = None
 
     def show_home(self):
         self.clear_frame()
@@ -39,9 +45,10 @@ class MainApp(ctk.CTk):
         self.current_frame.pack(fill="both", expand=True)
 
     def show_dashboard(self):
-        self.clear_frame()
-        self.clear_frame = DashboardFrame(self)
-        self.current_frame.pack(fill="both", expand=True)
+        self.clear_frame()  
+        self.current_frame = DashboardFrame(self) 
+        self.current_frame.pack(fill="both", expand=True)  
+
 
 if __name__ == "__main__":
     app = MainApp()

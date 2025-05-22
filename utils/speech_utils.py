@@ -17,11 +17,11 @@ def send_audio(filename):
             backend_url = os.getenv("BACKEND_URL")
             endpoint = f"{backend_url}/upload-audio"
             response = requests.post(endpoint, files=files)
-            print("✅ Audio sent successfully.")
-            print("📨 Server response:", response.text)
+            print("Audio sent successfully.")
+            print("Server response:", response.text)
             return response.json()
     except Exception as e:
-        print("🚫 Error sending audio:", e)
+        print("Error sending audio:", e)
         return{"error": str(e)}
 
 def handle_voice_interaction():
@@ -32,6 +32,8 @@ def handle_voice_interaction():
         response = send_audio(filename)
         if response and "text" in response:
             speak(response["text"])
+        return response
+    return {"error": "No audio"}
 
 
 if __name__ == "__main__":
