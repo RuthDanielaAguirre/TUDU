@@ -15,7 +15,7 @@ def send_audio(filename):
                 "file": (filename, f, "audio/wav")
             }
             backend_url = os.getenv("BACKEND_URL")
-            endpoint = f"{backend_url}/upload-audio"
+            endpoint = f"{backend_url}/voice/transcribe"
             response = requests.post(endpoint, files=files)
             print("Audio sent successfully.")
             print("Server response:", response.text)
@@ -30,9 +30,19 @@ def handle_voice_interaction():
         filename = "user_voice.wav"
         save_audio_to_wav(audio, filename)
         response = send_audio(filename)
+
         if response and "text" in response:
-            speak(response["text"])
-        return response
+            text =  response["text"]
+            speak(text)
+
+            create_keywords = ["crear","crea", "anota", "anotar", "hacer", "haz", "apuntar", "apunta", "escribe", "new"]
+            if any(word in text.lower() for word in create_keywords):
+                return {
+                    "action": "await_task_type",
+                    "text":  text,
+                }
+            return {"text": text}
+
     return {"error": "No audio"}
 
 
