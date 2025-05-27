@@ -1,23 +1,21 @@
 from fastapi import APIRouter, HTTPException
+
+from config.database import get_db_connection
 from models.command_model import CommandLog
 import mysql.connector
 from dotenv import load_dotenv
-import os
 
 load_dotenv()
 
-router = APIRouter(prefix="/voice", tags=["Voice"])
+router = APIRouter(prefix="/commands", tags=["Commands"])
+
 
 @router.post("/log")
 def log_phrase(command: CommandLog):
-    global cursor
+    conn = None
+    cursor = None
     try:
-        conn = mysql.connector.connect(
-            host=os.getenv("DB_HOST", "localhost"),
-            user=os.getenv("DB_USER", "root"),
-            password=os.getenv("DB_PASS", ""),
-            database=os.getenv("DB_NAME", "to_do_voz")
-        )
+        conn = get_db_connection()
         cursor= conn.cursor()
 
         sql = "INSERT INTO command_logs (phrase, action,type) VALUES (%s, %s, %s)"
