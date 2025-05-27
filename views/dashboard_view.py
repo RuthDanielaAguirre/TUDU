@@ -1,6 +1,4 @@
 import customtkinter as ctk
-from PIL import Image
-from customtkinter import CTkImage
 from utils.speech_utils import handle_voice_interaction
 from utils.ui_utils import (
     create_button,
@@ -8,7 +6,8 @@ from utils.ui_utils import (
     create_frame_s
 )
 from utils.input_audio_utils import toggle_speaker_on, toggle_speaker_off
-
+from utils.output_audio_utils import speak
+import random
 
 class DashboardFrame(ctk.CTkFrame):
     def __init__(self, master):
@@ -44,7 +43,7 @@ class DashboardFrame(ctk.CTkFrame):
         )
         self.task_entry.place(relx=0.5, rely=0.24, anchor="center")  # subido un poco
 
-        
+        #muestra las tareas
         self.task_box_left = create_frame_s(self, relx=0.25, rely=0.42, relwidth=0.3, relheight=0.35)
         self.task_box_right = create_frame_s(self, relx=0.75, rely=0.42, relwidth=0.3, relheight=0.35)
 
@@ -136,11 +135,77 @@ class DashboardFrame(ctk.CTkFrame):
                 button.configure(fg_color="#2E2E2E")
 
     def handle_voice_with_feedback(self):
+        
         self.voice_indicator.lift()
+
+        frases_inicio = [
+            "Hola, ¿qué quieres hacer?",
+            "¿Qué necesitas hoy?",
+            "Dime, ¿qué hacemos?",
+            "¿En qué te puedo ayudar?",
+            "Listo, dime qué quieres hacer"
+        ]
+        speak(random.choice(frases_inicio))
+
         response = handle_voice_interaction()
         self.voice_indicator.lower()
 
-        if isinstance(response, dict) and response.get("action") == "create_task":
-            task_text = response.get("text", "")
-            task_type = response.get("type", "Simple")
-            print(f"New Task: {task_text} [{task_type}]")
+        if isinstance(response, dict):
+            action = response.get("action")
+
+            if action == "await_task_type":
+                self.pending_task_text = response["text"]
+
+                frases_tipo = [
+                    "¿Qué tipo de tarea es: simple, subtarea o repetitiva?",
+                    "¿Cómo clasificarías esta tarea?",
+                    "¿Es una tarea normal, una subtarea o una repetitiva?",
+                    "Elige el tipo de tarea: simple, subtarea o repetitiva"
+                ]
+                speak(random.choice(frases_tipo))
+
+                self.voice_indicator.lift()
+                follow_up = handle_voice_interaction()
+                self.voice_indicator.lower()
+
+                task_type = "Simple"
+                if "subtarea" in follow_up.get("text", "").lower():
+                    task_type = "Subtask"
+                elif "repetitiva" in follow_up.get("text", "").lower():
+                    task_type = "Recurring"
+
+                self.add_task_to_panel(self.pending_task_text, task_type)
+
+                frases_confirmacion = [
+                    "Tarea registrada",
+                    "Tu nota ha sido añadida",
+                    "He guardado tu idea",
+                    "Tarea añadida",
+                    "Perfecto, lo he apuntado"
+                ]
+                speak(f"{random.choice(frases_confirmacion)}: {self.pending_task_text}")
+
+            elif action == "create_task":
+                task_text = response.get("text", "")
+                task_type = response.get("type", "Simple")
+                self.add_task_to_panel(task_text, task_type)
+
+                frases_confirmacion = [
+                    "Tarea registrada",
+                    "Tu nota ha sido añadida",
+                    "He guardado tu idea",
+                    "Tarea añadida",
+                    "Perfecto, lo he apuntado"
+                ]
+                speak(f"{random.choice(frases_confirmacion)}: {task_text}")
+
+
+    def add_task_to_panel(self,text, task_type="Simple"):
+        task_label = ctk.CTkLabel(
+            self.task_box_left,
+            text=f"{task_type}: {text}",
+            font=("Helvetica", 14),
+            text_color="#EAEAEA",
+            anchor="w"
+        )
+        task_label.pack(pady=5, anchor="w")
