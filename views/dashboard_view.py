@@ -7,6 +7,7 @@ from utils.ui_utils import (
 )
 from utils.input_audio_utils import toggle_speaker_on, toggle_speaker_off
 from utils.output_audio_utils import speak
+from utils.api import guardar_comando_en_bbdd
 import random
 
 class DashboardFrame(ctk.CTkFrame):
@@ -156,6 +157,12 @@ class DashboardFrame(ctk.CTkFrame):
             if action == "await_task_type":
                 self.pending_task_text = response["text"]
 
+                guardar_comando_en_bbdd(
+                    phrase=self.pending_task_text,
+                    action=action,
+                    tipo="Sin especificar"
+                )
+
                 frases_tipo = [
                     "¿Qué tipo de tarea es: simple, subtarea o repetitiva?",
                     "¿Cómo clasificarías esta tarea?",
@@ -188,6 +195,13 @@ class DashboardFrame(ctk.CTkFrame):
             elif action == "create_task":
                 task_text = response.get("text", "")
                 task_type = response.get("type", "Simple")
+
+                guardar_comando_en_bbdd(
+                    phrase=task_text,
+                    action=action,
+                    tipo=task_type
+                )
+
                 self.add_task_to_panel(task_text, task_type)
 
                 frases_confirmacion = [
