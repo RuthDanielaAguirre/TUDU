@@ -2,7 +2,7 @@ from fastapi import APIRouter, UploadFile, File, HTTPException
 import whisper
 import tempfile
 
-router= APIRouter()
+router= APIRouter(prefix="/voice", tags=["Voice"])
 
 @router.post("/transcribe")
 async def transcribe_audio(file: UploadFile = File(...)):

@@ -1,6 +1,9 @@
 from pydantic import BaseModel
+from typing import Optional
+
+
 
 class CommandLog(BaseModel):
     phrase: str
-    action: str = None
-    type: str = None
+    action: Optional[str]
+    type: Optional[str]

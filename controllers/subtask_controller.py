@@ -4,7 +4,7 @@ from models.subtask_model import SubtaskCreate
 
 router = APIRouter(prefix="/subtasks", tags=["Subtasks"])
 
-@router.post("/subtasks/create")
+@router.post("/create")
 def create_subtask(subtask: SubtaskCreate):
     conn = None
     cursor = None

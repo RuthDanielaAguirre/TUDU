@@ -159,8 +159,10 @@ def create_datepicker_with_label(master, label_text, relx, rely):
 def create_toggle_icon_button(master, image_on_path, image_off_path, command_on, command_off, relx, rely):
     state = {"on": False} 
 
-    image_on = CTkImage(Image.open(image_on_path), size=(32, 32))
-    image_off = CTkImage(Image.open(image_off_path), size=(32, 32))
+    image_on = CTkImage(Image.open(image_on_path), size=(30, 30))
+    image_off = CTkImage(Image.open(image_off_path), size=(30, 30))
+
+
 
     def toggle():
         state["on"] = not state["on"]

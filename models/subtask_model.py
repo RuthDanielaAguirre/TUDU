@@ -5,5 +5,5 @@ from datetime import date
 class SubtaskCreate(BaseModel):
     description: str
     id_task_parent: int
-    state: int = 1
+    state: int
     due_date: Optional[date]

@@ -1,4 +1,8 @@
 import customtkinter as ctk
+from PIL import Image
+from customtkinter import CTkImage
+from services.task_service import sendToBackend
+from services.voice_action_handler import handle_voice_action
 from utils.speech_utils import handle_voice_interaction
 from utils.ui_utils import (
     create_button,
@@ -8,13 +12,19 @@ from utils.ui_utils import (
 from utils.input_audio_utils import toggle_speaker_on, toggle_speaker_off
 from utils.output_audio_utils import speak
 from utils.api import guardar_comando_en_bbdd
-import random
+from utils.voice_responses import get_random_phrase
+import requests
+from utils.api import BACKEND_URL
+
 
 class DashboardFrame(ctk.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
         self.master = master
         self.configure(fg_color="#121212")
+
+        self.mic_on_img = CTkImage(Image.open("assets/mic_on.png"), size=(24, 24))
+        self.mic_off_img = CTkImage(Image.open("assets/mic_off.png"), size=(24, 24))
 
         # Title
         self.title_label = ctk.CTkLabel(
@@ -68,7 +78,7 @@ class DashboardFrame(ctk.CTkFrame):
         self.create_button.place(relx=0.5, rely=0.82, anchor="center")
 
         #microphone
-        create_toggle_icon_button(
+        self.mic_button = create_toggle_icon_button(
             master=self,
             image_on_path="assets/mic_on.png",
             image_off_path="assets/mic_off.png",
@@ -101,6 +111,7 @@ class DashboardFrame(ctk.CTkFrame):
         self.voice_indicator.lower()  
 
         self.update_filter_styles()
+
 
     def create_filter_button(self, text, relx):
         button = ctk.CTkButton(
@@ -136,90 +147,96 @@ class DashboardFrame(ctk.CTkFrame):
                 button.configure(fg_color="#2E2E2E")
 
     def handle_voice_with_feedback(self):
-        
-        self.voice_indicator.lift()
 
-        frases_inicio = [
-            "Hola, ¿qué quieres hacer?",
-            "¿Qué necesitas hoy?",
-            "Dime, ¿qué hacemos?",
-            "¿En qué te puedo ayudar?",
-            "Listo, dime qué quieres hacer"
-        ]
-        speak(random.choice(frases_inicio))
+        self.voice_indicator.lift()
+        self.start_mic_animation()
 
         response = handle_voice_interaction()
+
+        start = get_random_phrase("inicio")
+        speak(start)
+
+        response = handle_voice_interaction()
+
+        self.stop_mic_animation()
         self.voice_indicator.lower()
 
-        if isinstance(response, dict):
-            action = response.get("action")
+        if response:
+            handle_voice_action(response, self)
 
-            if action == "await_task_type":
-                self.pending_task_text = response["text"]
+    def handle_create_task(dashboard):
+        speak(get_random_phrase("tipo_tarea"))
+        response = handle_voice_interaction()
 
-                guardar_comando_en_bbdd(
-                    phrase=self.pending_task_text,
-                    action=action,
-                    tipo="Sin especificar"
-                )
+        if not response or "text" not in response:
+            speak("No entendí el tipo de tarea")
+            return
 
-                frases_tipo = [
-                    "¿Qué tipo de tarea es: simple, subtarea o repetitiva?",
-                    "¿Cómo clasificarías esta tarea?",
-                    "¿Es una tarea normal, una subtarea o una repetitiva?",
-                    "Elige el tipo de tarea: simple, subtarea o repetitiva"
-                ]
-                speak(random.choice(frases_tipo))
+        tipo = "Simple"
+        if "subtarea" in response["text"].lower():
+            tipo = "Subtask"
+        elif "repetitiva" in response["text"].lower():
+            tipo = "Recurring"
 
-                self.voice_indicator.lift()
-                follow_up = handle_voice_interaction()
-                self.voice_indicator.lower()
+        texto = dashboard.pending_task_text if hasattr(dashboard, 'pending_task_text') else response["text"]
 
-                task_type = "Simple"
-                if "subtarea" in follow_up.get("text", "").lower():
-                    task_type = "Subtask"
-                elif "repetitiva" in follow_up.get("text", "").lower():
-                    task_type = "Recurring"
+        # Guardar en BBDD
+        sendToBackend(texto, tipo)
+        guardar_comando_en_bbdd(texto, "create_task", tipo)
 
-                self.add_task_to_panel(self.pending_task_text, task_type)
+        dashboard.add_task_to_panel(texto, tipo)
 
-                frases_confirmacion = [
-                    "Tarea registrada",
-                    "Tu nota ha sido añadida",
-                    "He guardado tu idea",
-                    "Tarea añadida",
-                    "Perfecto, lo he apuntado"
-                ]
-                speak(f"{random.choice(frases_confirmacion)}: {self.pending_task_text}")
+        speak(get_random_phrase("confirmacion") + f": {texto}")
 
-            elif action == "create_task":
-                task_text = response.get("text", "")
-                task_type = response.get("type", "Simple")
+    def add_task_to_panel(self, text, task_type="Simple"):
+        color = "#8C7853"
+        icon_path = "assets/default.png"
 
-                guardar_comando_en_bbdd(
-                    phrase=task_text,
-                    action=action,
-                    tipo=task_type
-                )
+        if task_type == "Simple":
+            color = "#4A90E2"
+            icon_path = "assets/task.png"
+        elif task_type == "Subtask":
+            color = "#50E3C2"
+            icon_path = "assets/subtask.png"
+        elif task_type == "Recurring":
+            color = "#F5A623"
+            icon_path = "assets/cycle.png"
 
-                self.add_task_to_panel(task_text, task_type)
+        icon = CTkImage(Image.open(icon_path), size=(20, 20))
 
-                frases_confirmacion = [
-                    "Tarea registrada",
-                    "Tu nota ha sido añadida",
-                    "He guardado tu idea",
-                    "Tarea añadida",
-                    "Perfecto, lo he apuntado"
-                ]
-                speak(f"{random.choice(frases_confirmacion)}: {task_text}")
-
-
-    def add_task_to_panel(self,text, task_type="Simple"):
-        task_label = ctk.CTkLabel(
+        label = ctk.CTkLabel(
             self.task_box_left,
-            text=f"{task_type}: {text}",
+            text=f" {text}",
+            image=icon,
+            compound="left",
             font=("Helvetica", 14),
-            text_color="#EAEAEA",
+            text_color=color,
             anchor="w"
         )
-        task_label.pack(pady=5, anchor="w")
+        label.pack(pady=5, anchor="w")
+
+    def start_mic_animation(self):
+        self.mic_blinking = True
+        self.blink_mic_icon()
+
+    def blink_mic_icon(self):
+        if not self.mic_blinking:
+            return
+        current = self.mic_button.cget("image")
+        new_image = self.mic_off_img if current == self.mic_on_img else self.mic_on_img
+        self.mic_button.configure(image = new_image)
+        self.after(500, self.blink_mic_icon)
+
+    def stop_mic_animation(self):
+        self.mic_blinking = False
+        self.mic_button.configure(image = self.mic_on_img)
+
+    def load_tasks_from_db(self):
+        try:
+            response = requests.get(f"{BACKEND_URL}/tasks/by-user/1")
+            if response.status_code == 200:
+                tasks = response.json()
+                for task in tasks:
+                    self.add_task_to_panel(task["description"], "Simple")
+        except:
+            print("No se pudieron cargar las tareas.")

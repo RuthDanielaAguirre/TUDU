@@ -35,7 +35,7 @@ def handle_voice_interaction():
             text =  response["text"]
             speak(text)
 
-            create_keywords = ["crear","crea", "anota", "anotar", "hacer", "haz", "apuntar", "apunta", "escribe", "new"]
+            create_keywords = ["crear","crea", "anota", "anotar", "hacer", "haz", "apuntar", "apunta", "escribe", "new", "añade", "añadir"]
             if any(word in text.lower() for word in create_keywords):
                 return {
                     "action": "await_task_type",
