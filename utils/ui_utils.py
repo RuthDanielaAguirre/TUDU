@@ -114,6 +114,55 @@ def create_back_button(master, texto, comando, relx, rely):
     back_button.place(relx=relx, rely=rely, anchor="center")
     return back_button
 
+import customtkinter as ctk
+from tkinter import Toplevel, Label
+from PIL import Image
+
+def create_icon_button(master, comando, image_path, relx=0.5, rely=0.5, size=28, tooltip_text=None):
+    icon_image = ctk.CTkImage(Image.open(image_path), size=(size, size))
+
+    button = ctk.CTkButton(
+        master,
+        image=icon_image,
+        text="",
+        command=comando,
+        width=size,
+        height=size,
+        corner_radius=10,
+        fg_color="#2E2E2E",
+        border_width=1,
+        border_color="#EAEAEA",
+        hover_color="#8C7853"
+    )
+    button.place(relx=relx, rely=rely, anchor="center")
+
+    if tooltip_text:
+        create_tooltip(button, tooltip_text)
+
+    return button
+
+
+def create_tooltip(widget, text):
+    tooltip = Toplevel(widget)
+    tooltip.withdraw()
+    tooltip.overrideredirect(True)
+    label = Label(tooltip, text=text, background="#444", foreground="#fff", relief='solid',
+                  borderwidth=1, padx=4, pady=2, font=("Arial", 9))
+    label.pack()
+
+    def enter(event):
+        x = widget.winfo_rootx() + 50
+        y = widget.winfo_rooty() + 10
+        tooltip.geometry(f"+{x}+{y}")
+        tooltip.deiconify()
+
+    def leave(event):
+        tooltip.withdraw()
+
+    widget.bind("<Enter>", enter)
+    widget.bind("<Leave>", leave)
+
+
 def create_datepicker_with_label(master, label_text, relx, rely):
     font_label = ("Helvetica", 14)
 

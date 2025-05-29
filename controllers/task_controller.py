@@ -59,13 +59,21 @@ def get_tasks_by_user(id_user: int = Path(..., description="ID del usuario")):
         cursor = conn.cursor(dictionary=True)
 
         sql = """
-        SELECT id_task, description
-        FROM tasks
-        WHERE id_user = %s AND id_type_task != 2
+        SELECT 
+            t.id_task,
+            t.description,
+            t.state,
+            t.created_date,
+            t.repeat_interval,
+            tt.name AS type_name  
+        FROM tasks t
+        LEFT JOIN types_tasks tt ON t.id_type_task = tt.id_type_task
+        WHERE t.id_user = %s
+        ORDER BY t.created_date DESC
         """
         cursor.execute(sql, (id_user,))
-        return cursor.fetchall()
-
+        tasks = cursor.fetchall()
+        return tasks
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     finally:
