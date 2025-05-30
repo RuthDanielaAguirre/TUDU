@@ -102,9 +102,10 @@ class DashboardFrame(ctk.CTkFrame):
         if response:
             handle_voice_action(response, self)
 
-    def add_task_to_panel(self, text, task_type="Simple"):
+    def add_task_to_panel(self, text, task_type="Simple", panel="left",  task_id=None):
         color = "#8C7853"
         icon_path = "assets/default.png"
+
         if task_type == "Simple":
             color = "#4A90E2"
             icon_path = "assets/task.png"
@@ -114,18 +115,42 @@ class DashboardFrame(ctk.CTkFrame):
         elif task_type == "Recurring":
             color = "#F5A623"
             icon_path = "assets/cycle.png"
+
         icon = CTkImage(Image.open(icon_path), size=(20, 20))
+
+        parent_panel = self.task_box_right if panel == "right" else self.task_box_left
+
         label = ctk.CTkLabel(
-            self.task_box_left,
-            text=f"  {text}",  # Añadido doble espacio
+            parent_panel,
+            text=f"  {text}",
             image=icon,
             compound="left",
             font=("Helvetica", 14),
             text_color=color,
             anchor="w",
-            padx=10  # margen horizontal
+            padx=8
         )
         label.pack(pady=5, anchor="w")
+
+        if panel == "right":
+            label.bind("<Button-1>", lambda e, tid=task_id, desc=text: self.handle_task_click(tid, desc))
+
+        label.pack(pady=5, anchor="w")
+
+    def handle_task_click(self, task_id, description):
+        popup = ctk.CTkToplevel(self)
+        popup.title("Manage Task")
+        popup.geometry("300x150")
+        popup.grab_set()
+
+        label = ctk.CTkLabel(popup, text=description, font=("Helvetica", 14))
+        label.pack(pady=10)
+
+        btn_edit = ctk.CTkButton(popup, text="Edit", command=lambda: self.edit_task_popup(task_id, popup))
+        btn_edit.pack(pady=5)
+
+        btn_delete = ctk.CTkButton(popup, text="Delete", command=lambda: self.delete_task(task_id, popup))
+        btn_delete.pack(pady=5)
 
     def start_mic_animation(self):
         self.mic_blinking = True
@@ -145,13 +170,16 @@ class DashboardFrame(ctk.CTkFrame):
 
     def load_tasks_from_db(self):
         try:
-            response = requests.get(f"{BACKEND_URL}/tasks/by-user/1")
+            response = requests.get(f"{BACKEND_URL}/tasks/by-user/4")
             if response.status_code == 200:
                 tasks = response.json()
+                for widget in self.task_box_right.winfo_children():
+                    widget.destroy()
+
                 for task in tasks:
-                    self.add_task_to_panel(task["description"], "Simple")
-        except:
-            print("No se pudieron cargar las tareas.")
+                    self.add_task_to_panel(task["description"],panel="right",task_id=task["id_task"])
+        except Exception as e:
+                print(f"No se pudieron cargar las tareas: {e}")
 
     def create_manual_task(self):
         description = self.task_entry.get()
@@ -180,10 +208,39 @@ class DashboardFrame(ctk.CTkFrame):
             speak(get_random_phrase("confirmacion") + f": {description}")
             self.task_entry.delete(0, "end")
 
-    def edit_task(self):
-        speak("Tarea modificada.")
-        print("The task was successfully modified")
+    def edit_task(self, task_id, new_description, popup):
+        try:
+            response = requests.put(f"{BACKEND_URL}/tasks/update/{task_id}", json={"description": new_description})
+            if response.status_code == 200:
+                speak("Tarea actualizada.")
+                popup.destroy()
+                self.load_tasks_from_db()
+            else:
+                speak("No se pudo actualizar la tarea.")
+        except Exception as e:
+            print(f"Error editando tarea: {e}")
 
     def delete_task(self):
         speak("Tarea eliminada.")
         print("The task was successfully deleted")
+
+    def edit_task_popup(self, task_id, popup):
+        popup.destroy()
+
+        edit_popup = ctk.CTkToplevel(self)
+        edit_popup.title("Edit Task")
+        edit_popup.geometry("350x200")
+        edit_popup.grab_set()
+
+        label = ctk.CTkLabel(edit_popup, text="New Description", font=("Helvetica", 14))
+        label.pack(pady=10)
+
+        entry = ctk.CTkEntry(edit_popup, width=300)
+        entry.pack(pady=5)
+
+        submit_btn = ctk.CTkButton(
+            edit_popup,
+            text="Save Changes",
+            command=lambda: self.edit_task(task_id, entry.get(), edit_popup)
+        )
+        submit_btn.pack(pady=10)

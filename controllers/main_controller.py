@@ -24,5 +24,5 @@ app.include_router(task_router)
 app.include_router(subtask_router)
 
 for route in app.routes:
-    print(f"✅ {route.path} [{route.name}]")
+    print(f" {route.path} [{route.name}]")
 

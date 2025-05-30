@@ -8,7 +8,7 @@ pygame.mixer.init()
 
 def speak(text, lang="es"):
     if not speaker_status():
-        print("🔇 Altavoz desactivado. No se reproducirá voz.")
+        print("Altavoz desactivado. No se reproducirá voz.")
         return
     try:
         tts = gTTS(text, lang=lang)

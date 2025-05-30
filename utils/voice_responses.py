@@ -57,7 +57,33 @@ def get_random_phrase(tipo):
             "No entendí eso, ¿puedes decirlo de otra forma?",
             "Perdona, no reconocí la acción. ¿Quieres intentarlo de nuevo?",
             "Esa opción no está disponible. Intenta decirlo de otra manera.",
-        ]
+        ],
+        "confirmacion_delete": [
+            "Tarea eliminada correctamente",
+            "He borrado la tarea",
+            "La tarea ya no está en la lista"
+        ],
+        "confirmacion_update": [
+            "Tarea modificada correctamente",
+            "He actualizado la tarea",
+            "La tarea ha sido editada"
+        ],
+        "preguntar_tarea_antigua": [
+            "¿Cuál es la tarea que quieres modificar?",
+            "Dime el nombre de la tarea que quieres cambiar"
+        ],
+        "preguntar_tarea_nueva": [
+            "¿Por qué texto quieres reemplazarla?",
+            "Dime el nuevo contenido de la tarea"
+        ],
+        "tarea_actualizada": [
+            "He actualizado la tarea",
+            "Tarea modificada correctamente"
+        ],
+        "tarea_no_encontrada": [
+            "No encontré la tarea que querías modificar",
+            "Esa tarea no existe"
+    ]
     }
 
     return random.choice(frases.get(tipo, ["..."]))
