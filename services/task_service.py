@@ -31,7 +31,7 @@ def sendToBackend(description, task_type="Simple", prioridad="Media", repeat_int
         return False
 
     if not id_tag_task:
-        id_tag_task = 2  # Media como valor por defecto
+        id_tag_task = 2
 
     data = {
         "description": description,
